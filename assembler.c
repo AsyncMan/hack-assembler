@@ -73,9 +73,6 @@ int main(int argc, char *argv[]) {
   char line[255];
   int lineNumber = 0;
 
-  while (fgets(line, 255, sourceCode)) {
-    printf("LINE %d: %s", lineNumber++, line);
-  }
 
   symbol_table table = {.symbol = malloc(sizeof(symbol_value) * 23),
                         .size = 23};
@@ -153,7 +150,6 @@ int main(int argc, char *argv[]) {
 
   lineNumber = 0;
   while (fgets(line, 255, sourceCode)) {
-    printf("LINE %d: %s", lineNumber, line);
     u16 letterAt = 0;
 
     u16 ops = 0;
@@ -170,12 +166,8 @@ int main(int argc, char *argv[]) {
       table.symbol[table.size - 1].symbol = malloc(strlen(line) * sizeof(char));
       strcpy(table.symbol[table.size - 1].symbol, &line[letterAt]);
       table.symbol[table.size - 1].value = lineNumber;
-      fprintf(stderr, "ADD LABEL %s, to the table with value %d.\n",
-              table.symbol[table.size - 1].symbol,
-              table.symbol[table.size - 1].value);
       continue;
     } else if (line[letterAt] == '/') {
-      fprintf(stderr, "SKIP: LINE %d COMMENT\n", lineNumber);
       continue;
     } else if (line[letterAt] == '\0' || line[letterAt] == '\n') {
       continue;
@@ -191,13 +183,9 @@ int main(int argc, char *argv[]) {
     int letterAt = 0;
     letterAt = skip_space(letterAt, line);
     u16 binaryLine = 0;
-    if (lineNumber == 4253){
-      printf("ERROR HERE");
-    }
 
     // A instruction
     if (line[letterAt] == '@') {
-      printf("Line %d: %s", lineNumber, line);
       letterAt++;
       line[strcspn(line, "\n")] = '\0';
       if (line[letterAt] <= '9' && line[letterAt] >= '0') {
@@ -205,7 +193,6 @@ int main(int argc, char *argv[]) {
       } else {
         bool found = false;
         for (int i = 0; i < table.size; i++) {
-          fprintf(stdout, "%s = %s\n", table.symbol[i].symbol, &line[letterAt]);
           if (strcmp(&line[letterAt], table.symbol[i].symbol) == 0) {
             binaryLine = table.symbol[i].value;
             found = true;
@@ -222,9 +209,6 @@ int main(int argc, char *argv[]) {
               malloc(strlen(line) * sizeof(char));
           strcpy(table.symbol[table.size - 1].symbol, &line[letterAt]);
           table.symbol[table.size - 1].value = value++;
-          fprintf(stderr, "ADD VARIABLE %s, to the table with value %d.\n",
-                  table.symbol[table.size - 1].symbol,
-                  table.symbol[table.size - 1].value);
           binaryLine = table.symbol[table.size - 1].value;
         }
       }
@@ -428,8 +412,6 @@ int main(int argc, char *argv[]) {
       }
     }
 
-    printf("%s -> %d -> %s\n", line, binaryLine,
-           number_to_binary_char(binaryLine));
     fprintf(objFile, "%s\n", number_to_binary_char(binaryLine));
     lineNumber++;
   }
